@@ -1,11 +1,10 @@
-(function() {
 "use strict";
 
 var supportsMultiple = self.HTMLInputElement && "valueLow" in HTMLInputElement.prototype;
 
 var descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
 
-self.multirange = function(input) {
+module.exports = function Multirange (input) {
 	if (supportsMultiple || input.classList.contains("multirange")) {
 		return;
 	}
@@ -24,7 +23,6 @@ self.multirange = function(input) {
 	input.parentNode.insertBefore(ghost, input.nextSibling);
 
 	Object.defineProperty(input, "originalValue", descriptor.get ? descriptor : {
-		// Fuck you Safari >:(
 		get: function() { return this.value; },
 		set: function(v) { this.value = v; }
 	});
@@ -43,7 +41,6 @@ self.multirange = function(input) {
 	});
 
 	if (descriptor.get) {
-		// Again, fuck you Safari
 		Object.defineProperty(input, "value", {
 			get: function() { return this.valueLow + "," + this.valueHigh; },
 			set: function(v) {
@@ -64,17 +61,4 @@ self.multirange = function(input) {
 	ghost.addEventListener("input", update);
 
 	update();
-}
-
-multirange.init = function() {
-	Array.from(document.querySelectorAll("input[type=range][multiple]:not(.multirange)")).forEach(multirange);
-}
-
-if (document.readyState == "loading") {
-	document.addEventListener("DOMContentLoaded", multirange.init);
-}
-else {
-	multirange.init();
-}
-
-})();
+};
